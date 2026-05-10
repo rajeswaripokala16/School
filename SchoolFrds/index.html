@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Friendship Memories Showcase
+
+</title>
+  <meta name="description" content="A responsive memories showcase with rotating friendship photos, changing quotes, background music, and video." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Playfair+Display:wght@500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css" />
+
+  <style>
+    :root {
+      --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+      --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+      --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+      --text-lg: clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
+      --text-xl: clamp(1.5rem, 1.2rem + 1.25vw, 2.25rem);
+      --text-2xl: clamp(2rem, 1.2rem + 2.5vw, 3.8rem);
+
+      --space-2: 0.5rem;
+      --space-3: 0.75rem;
+      --space-4: 1rem;
+      --space-5: 1.25rem;
+      --space-6: 1.5rem;
+      --space-8: 2rem;
+      --space-10: 2.5rem;
+      --space-12: 3rem;
+      --space-16: 4rem;
+      --space-20: 5rem;
+      --space-24: 6rem;
+
+      --color-bg: #0d0d0d;
+      --color-bg-soft: #151515;
+      --color-surface: rgba(255, 255, 255, 0.06);
+      --color-surface-2: rgba(255, 255, 255, 0.08);
+      --color-border: rgba(255, 255, 255, 0.1);
+      --color-text: #f5f5f5;
+      --color-text-muted: rgba(245, 245, 245, 0.75);
+      --color-text-faint: rgba(245, 245, 245, 0.55);
+      --color-primary: #d4af37;
+      --color-primary-soft: rgba(212, 175, 55, 0.16);
+
+      --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.38);
+      --shadow-md: 0 12px 28px rgba(0, 0, 0, 0.28);
+      --shadow-sm: 0 6px 18px rgba(0, 0, 0, 0.2);
+
+      --radius-md: 1rem;
+      --radius-lg: 1.5rem;
+      --radius-xl: 2rem;
+      --radius-full: 9999px;
+
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-body: 'Montserrat', system-ui, sans-serif;
+
+      --content: min(1160px, calc(100vw - 2rem));
+      --transition: 260ms cubic-bezier(0.16, 1, 0.3, 1);
+      --slide-duration: 3000ms;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100dvh;
+      font-family: var(--font-body);
+      font-size: var(--text-base);
+      line-height: 1.65;
+      color: var(--color-text);
+      background:
+        radial-gradient(circle at top, rgba(212,175,55,0.12), transparent 24%),
+        radial-gradient(circle at bottom right, rgba(212,175,55,0.08), transparent 20%),
+        linear-gradient(180deg, #080808 0%, #0d0d0d 48%, #121212 100%);
+      overflow-x: hidden;
+    }
+
+    img, video {
+      display: block;
+      max-width: 100%;
+    }
+
+    button {
+      font: inherit;
+      border: none;
+      cursor: pointer;
+    }
+
+    .page-shell {
+      width: var(--content);
+      margin: 0 auto;
+      padding: clamp(var(--space-16), 8vw, var(--space-24)) 0;
+    }
+
+    .hero-intro {
+      text-align: center;
+      display: grid;
+      gap: var(--space-4);
+      justify-items: center;
+      margin-bottom: var(--space-16);
+    }
+
+    .section-kicker {
+      font-size: var(--text-xs);
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--color-primary);
+      padding: 0.5rem 0.95rem;
+      border-radius: var(--radius-full);
+      border: 1px solid rgba(212,175,55,0.28);
+      background: rgba(255,255,255,0.03);
+    }
+
+    h1, h2, h3 {
+      font-family: var(--font-display);
+      line-height: 1.05;
+    }
+
+    h1 {
+      font-size: var(--text-2xl);
+      max-width: 12ch;
+    }
+
+    .lead {
+      max-width: 65ch;
+      color: var(--color-text-muted);
+    }
+
+    .quotes-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-4);
+      margin-block: var(--space-8);
+    }
+
+    .glass-card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+      border: 1px solid var(--color-border);
+      box-shadow: var(--shadow-md);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-radius: var(--radius-lg);
+    }
+
+    .mini-quote {
+      padding: var(--space-5);
+      text-align: center;
+      transition: transform var(--transition), border-color var(--transition);
+    }
+
+    .mini-quote:hover {
+      transform: translateY(-4px);
+      border-color: rgba(212,175,55,0.24);
+    }
+
+    .mini-quote p {
+      font-family: var(--font-display);
+      font-size: var(--text-lg);
+    }
+
+    .showcase-grid {
+      display: grid;
+      gap: var(--space-10);
+      align-items: start;
+      margin-block: var(--space-12);
+    }
+
+    .slider-panel,
+    .video-panel {
+      position: relative;
+    }
+
+    .photo-slider {
+      position: relative;
+      width: 100%;
+      min-height: 360px;
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      background: #111;
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: var(--shadow-lg);
+      isolation: isolate;
+    }
+
+    .photo-slider::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0.08), rgba(0,0,0,0.48));
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      transform: scale(1.08);
+      transition: opacity 1.2s ease, transform 2.2s ease;
+    }
+
+    .slide.active {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .slider-overlay {
+      position: absolute;
+      left: var(--space-5);
+      right: var(--space-5);
+      bottom: var(--space-5);
+      z-index: 2;
+      display: grid;
+      gap: var(--space-4);
+    }
+
+    .overlay-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-4);
+      flex-wrap: wrap;
+    }
+
+    .slide-counter,
+    .music-status {
+      padding: 0.55rem 0.9rem;
+      border-radius: var(--radius-full);
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      font-size: var(--text-sm);
+      backdrop-filter: blur(14px);
+    }
+
+    .dynamic-quote {
+      padding: 1rem 1.1rem;
+      border-radius: var(--radius-lg);
+      background: rgba(10,10,10,0.35);
+      border: 1px solid rgba(255,255,255,0.14);
+      backdrop-filter: blur(16px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .dynamic-quote h3 {
+      font-size: var(--text-sm);
+      font-family: var(--font-body);
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--color-primary);
+      margin-bottom: 0.6rem;
+    }
+
+    .dynamic-quote p {
+      font-family: var(--font-display);
+      font-size: clamp(1.1rem, 0.95rem + 0.8vw, 1.6rem);
+      line-height: 1.45;
+      min-height: 4.8rem;
+    }
+
+    .typing-cursor::after {
+      content: '|';
+      display: inline-block;
+      margin-left: 2px;
+      color: var(--color-primary);
+      animation: blink 0.8s steps(1) infinite;
+    }
+
+    @keyframes blink {
+      50% {
+        opacity: 0;
+      }
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 4px;
+      border-radius: var(--radius-full);
+      background: rgba(255,255,255,0.12);
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--color-primary), #f0d67a);
+      animation: fillBar var(--slide-duration) linear infinite;
+      transform-origin: left center;
+    }
+
+    @keyframes fillBar {
+      from { width: 0%; }
+      to { width: 100%; }
+    }
+
+    .slider-controls {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-4);
+      margin-top: var(--space-5);
+      flex-wrap: wrap;
+    }
+
+    .control-btn {
+      min-width: 44px;
+      min-height: 44px;
+      padding: 0.9rem 1.2rem;
+      border-radius: var(--radius-full);
+      background: var(--color-surface);
+      color: var(--color-text);
+      border: 1px solid var(--color-border);
+      transition: transform var(--transition), background var(--transition), border-color var(--transition);
+    }
+
+    .control-btn:hover {
+      transform: translateY(-2px);
+      background: var(--color-surface-2);
+      border-color: rgba(212,175,55,0.22);
+    }
+
+    .featured-video-wrap {
+      display: grid;
+      gap: var(--space-4);
+    }
+
+    .featured-video {
+      width: 100%;
+      min-height: 280px;
+      object-fit: cover;
+      border-radius: var(--radius-xl);
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: var(--shadow-lg);
+      background: #000;
+    }
+
+    .video-note {
+      color: var(--color-text-muted);
+      text-align: center;
+    }
+
+    .music-player {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+      align-items: flex-end;
+    }
+
+    .music-btn {
+      background: rgba(212, 175, 55, 0.96);
+      color: #111;
+      border: none;
+      padding: 0.95rem 1.2rem;
+      border-radius: 999px;
+      font-weight: 800;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      min-width: 44px;
+      min-height: 44px;
+    }
+
+    .music-btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .music-pill {
+      padding: 0.55rem 0.9rem;
+      border-radius: var(--radius-full);
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      backdrop-filter: blur(12px);
+      color: var(--color-text-muted);
+      font-size: var(--text-sm);
+    }
+
+    .footer-note {
+      margin-top: var(--space-12);
+      text-align: center;
+      color: var(--color-text-faint);
+      font-size: var(--text-sm);
+    }
+
+    @media (min-width: 768px) {
+      .quotes-row {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .showcase-grid {
+        grid-template-columns: 1.08fr 0.92fr;
+      }
+
+      .photo-slider,
+      .featured-video {
+        min-height: 560px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page-shell">
+    <section class="hero-intro" data-aos="fade-up">
+      <span class="section-kicker">Friendship Memories🫂✨
+
+</span>
+      <h1>School gave us classrooms, but friendship gave us the best memories..🎓🤍</h1>
+      <p class="lead">
+        We started as classmates and became the people who made every day special.💛📚
+      </p>
+    </section>
+
+    <section>
+      <div class="quotes-row quotes-top">
+        <article class="mini-quote glass-card" data-aos="fade-right">
+          <p>“Good friends turn ordinary days into unforgettable chapters.🫂”</p>
+        </article>
+        <article class="mini-quote glass-card" data-aos="fade-up">
+          <p>“The best school memories were built between laughter and late talks.✨”</p>
+        </article>
+        <article class="mini-quote glass-card" data-aos="fade-left">
+          <p>“Friendship was the real subject we mastered together.🎓”</p>
+        </article>
+      </div>
+
+      <div class="showcase-grid">
+        <div class="slider-panel">
+          <div class="photo-slider" id="photoSlider" data-aos="zoom-in-up">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            <img src="pic3.jpeg" alt="Friendship memory 3" class="slide" loading="lazy">
+            <img src="cake.jpeg" alt="Friendship memory 4" class="slide" loading="lazy">
+            <img src="picc11.jpeg" alt="Friendship memory 1" class="slide active" loading="lazy">
+            <img src="picc11.jpeg" alt="Friendship memory 4" class="slide" loading="lazy">
+            <img src="cake.jpeg" alt="Friendship memory 4" class="slide" loading="lazy">
+            <img src="pic4.jpeg" alt="Friendship memory 4" class="slide" loading="lazy">
+            <img src="pic8.jpeg" alt="Friendship memory 1" class="slide active" loading="lazy" >
+            <img src="cake.jpeg" alt="Friendship memory 4" class="slide" loading="lazy">
+            <img src="picc11.jpeg" alt="Friendship memory 2" class="slide" loading="lazy">
+            <img src="pic3.jpeg" alt="Friendship memory 3" class="slide" loading="lazy">
+            <img src="picc11.jpeg" alt="Friendship memory 4" class="slide" loading="lazy" >
+            <img src="pic10.jpeg" alt="Friendship memory 1" class="slide active" loading="lazy">
+            <img src="picc11.jpeg" alt="Friendship memory 2" class="slide" loading="lazy">
+            <img src="cake.jpeg" alt="Friendship memory 1" class="slide active" loading="lazy">
+            <img src="pic8.jpeg" alt="Friendship memory 3" class="slide" loading="lazy">
+            <img src="pic4.jpeg" alt="Friendship memory 4" class="slide" loading="lazy">
+            <img src="pic3.jpeg" alt="Friendship memory 3" class="slide" loading="lazy" >
+            <img src="cake.jpeg" alt="Friendship memory 4" class="slide" loading="lazy">
+            <img src="picc11.jpeg" alt="Friendship memory 1" class="slide active" loading="lazy">
+            <img src="picc11.jpeg" alt="Friendship memory 4" class="slide" loading="lazy">
+            <img src="cake.jpeg" alt="Friendship memory 4" class="slide" loading="lazy">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            <div class="slider-overlay">
+              <div class="overlay-top">
+                <div class="slide-counter" id="slideCounter">01 / 21</div>
+                <div class="music-status" id="musicStatus">PICS</div>
+              </div>
+
+              <div class="dynamic-quote">
+                <h3>Memory</h3>
+                <p id="dynamicQuote" class="typing-cursor"></p>
+              </div>
+
+              <div class="progress-track">
+                <div class="progress-bar" id="progressBar"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="slider-controls" data-aos="fade-up">
+            <button class="control-btn" id="prevSlide">Previous</button>
+            <button class="control-btn" id="nextSlide">Next</button>
+          </div>
+        </div>
+
+        <div class="video-panel">
+          <div class="featured-video-wrap" data-aos="fade-left">
+            <video class="featured-video" autoplay muted loop playsinline controls poster="YOUR-POSTER.jpg">
+              <source src="vidio1.mp4" type="video/mp4">
+            </video>
+            <p class="video-note">Sharing The Lots Of Talks and Memories</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="quotes-row quotes-bottom">
+        <article class="mini-quote glass-card" data-aos="fade-right">
+          <p>“Some people enter a classroom and quietly become family.”</p>
+        </article>
+        <article class="mini-quote glass-card" data-aos="fade-up">
+          <p>“Years may pass, but real friends keep the same warmth.”</p>
+        </article>
+        <article class="mini-quote glass-card" data-aos="fade-left">
+          <p>“A photograph freezes the smile, but friendship keeps the feeling alive.”</p>
+        </article>
+      </div>
+    </section>
+
+    <p class="footer-note">
+      This Is A Tribute To The Friendship We Built Together, The Memories We Created, And The Unbreakable Bond That Still Connects Us. No Matter Where Life Takes Us, These Moments Will Always Be A Part Of Who We Are. Here's To The Laughter, The Talks, And The Beautiful Journey We Shared As Friends.
+    </p>
+  </main>
+
+  <div class="music-player">
+    <div class="music-pill" id="musicInfo">Tap anywhere once to start music</div>
+    <button class="music-btn" id="musicToggle">Play Music</button>
+  </div>
+
+  <audio id="bgMusic" loop playsinline preload="auto">
+    <source src="song.mp3" type="audio/mpeg">
+  </audio>
+
+  <script defer src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.AOS) {
+        AOS.init({
+          duration: 900,
+          once: true,
+          easing: 'ease-out-cubic',
+          offset: 60
+        });
+      }
+
+      const slides = document.querySelectorAll('#photoSlider .slide');
+      const dynamicQuote = document.getElementById('dynamicQuote');
+      const slideCounter = document.getElementById('slideCounter');
+      const progressBar = document.getElementById('progressBar');
+      const prevSlideBtn = document.getElementById('prevSlide');
+      const nextSlideBtn = document.getElementById('nextSlide');
+
+      const quotes = [
+        "A true friend is the memory behind every smile in this frame.",
+        "Friendship made every ordinary school day feel like a celebration.",
+        "Some pictures fade with time, but real friendships only grow brighter.",
+        "The best part of every memory was having the right people beside us.",
+        "Classmates by chance, friends by heart.",
+
+"School friends, forever chapters.",
+
+"Benches, bells, and best friends.",
+
+"We studied together and grew together.",
+
+"Friendship was our favorite subject.",
+
+"School felt like home because of you.",
+
+"School gave us lessons, but friendship gave us the memories we still carry.",
+"The classrooms may be behind us, but the laughter we shared still feels close.",
+"Some of the best parts of school were never in books, they were in the people beside us.",
+"We thought we were just passing time, but we were really making memories for life.",
+"The bell would ring and the class would end, but our stories were just beginning.",
+"School friends made ordinary days feel special without ever trying too hard.",
+"No matter how far life takes us, school friends remain part of who we are.",
+"Some friendships begin in a classroom and stay in the heart forever.",
+"Some pictures fade with time, but real friendships only grow brighter.",
+        "The best part of every memory was having the right people beside us.",
+        "Classmates by chance, friends by heart."
+
+      ];
+
+      let currentSlide = 0;
+      let autoSlide;
+
+      function typeWriter(text, element, speed = 35) {
+        element.textContent = '';
+        element.classList.add('typing-cursor');
+        let i = 0;
+
+        function type() {
+          if (i < text.length) {
+            element.textContent += text.charAt(i);
+            i++;
+            setTimeout(type, speed);
+          } else {
+            element.classList.remove('typing-cursor');
+          }
+        }
+
+        type();
+      }
+
+      function restartProgress() {
+        progressBar.style.animation = 'none';
+        void progressBar.offsetWidth;
+        progressBar.style.animation = 'fillBar var(--slide-duration) linear infinite';
+      }
+
+      function updateSlide(index) {
+        slides.forEach(slide => slide.classList.remove('active'));
+        slides[index].classList.add('active');
+
+        const total = String(slides.length).padStart(2, '0');
+        const current = String(index + 1).padStart(2, '0');
+        slideCounter.textContent = `${current} / ${total}`;
+
+        typeWriter(quotes[index], dynamicQuote, 28);
+        restartProgress();
+      }
+
+      function goToNextSlide() {
+        currentSlide = (currentSlide + 1) % slides.length;
+        updateSlide(currentSlide);
+      }
+
+      function goToPrevSlide() {
+        currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+        updateSlide(currentSlide);
+      }
+
+      function startAutoSlide() {
+        clearInterval(autoSlide);
+        autoSlide = setInterval(goToNextSlide, 5000);
+      }
+
+      if (slides.length > 0) {
+        updateSlide(currentSlide);
+        startAutoSlide();
+      }
+
+      nextSlideBtn.addEventListener('click', () => {
+        goToNextSlide();
+        startAutoSlide();
+      });
+
+      prevSlideBtn.addEventListener('click', () => {
+        goToPrevSlide();
+        startAutoSlide();
+      });
+
+      const bgMusic = document.getElementById('bgMusic');
+      const musicToggle = document.getElementById('musicToggle');
+      const musicInfo = document.getElementById('musicInfo');
+      const musicStatus = document.getElementById('musicStatus');
+
+      let userStartedMusic = false;
+
+      async function startMusic() {
+        try {
+          bgMusic.volume = 0.65;
+          await bgMusic.play();
+          userStartedMusic = true;
+          musicToggle.textContent = 'Pause Music';
+          musicInfo.textContent = 'Background music is playing';
+          musicStatus.textContent = 'Music playing';
+        } catch (error) {
+          musicInfo.textContent = 'Tap Play Music to start soundtrack';
+          musicStatus.textContent = 'Music blocked';
+        }
+      }
+
+      function pauseMusic() {
+        bgMusic.pause();
+        musicToggle.textContent = 'Play Music';
+        musicInfo.textContent = 'Music paused';
+        musicStatus.textContent = 'Music paused';
+      }
+
+      musicToggle.addEventListener('click', async () => {
+        if (bgMusic.paused) {
+          await startMusic();
+        } else {
+          pauseMusic();
+        }
+      });
+
+      document.addEventListener('click', async () => {
+        if (!userStartedMusic && bgMusic.paused) {
+          await startMusic();
+        }
+      }, { once: true });
+
+      bgMusic.addEventListener('ended', () => {
+        bgMusic.play();
+      });
+
+      document.addEventListener('visibilitychange', async () => {
+        if (!document.hidden && userStartedMusic && bgMusic.paused) {
+          try {
+            await bgMusic.play();
+          } catch (error) {}
+        }
+      });
+    });
+  </script>
+</body>
+</html>
